@@ -1,0 +1,18 @@
+{
+    "application": {
+        "language": "en",
+        "theme": "dark"
+    },
+    "database": {
+        "password": "pass456",
+        "port": 1433,
+        "server": "192.168.1.1",
+        "user": "user123"
+    },
+    "userIds": [
+        "3445003795",
+        "2560220262",
+        "582626",
+        "888"
+    ]
+}
