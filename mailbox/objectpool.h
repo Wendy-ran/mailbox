@@ -35,8 +35,8 @@ private:
 
 // 使用单例模式的 ObjectPool
 // auto& pool = ObjectPool<newSocket>::getInstance();
-// newSocket* socket = pool.acquire("socket1");
+// newSocket* socket = pool.acquire("xxx");  取用对象要指定一个“名字”
 // // 使用 socket...
-// pool.release("socket1", socket);
+// pool.release("xxx", socket);
 
 

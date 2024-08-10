@@ -1,5 +1,6 @@
 #include "ObjectPool.h"
 #include "newsocket.h"
+#include "newdatabase.h"
 
 template <typename T>
 ObjectPool<T>::ObjectPool() {
@@ -68,3 +69,4 @@ void ObjectPool<T>::release(const QString& name, T* object) {
 // template class ObjectPool<int>;
 // template class ObjectPool<QString>;
 template class ObjectPool<NewSocket>;  // 解决模板类成员在链接时因为未被实例化而导致的“undefined reference”错误
+template class ObjectPool<newDatabase>;  // 不知道为什么改成指针类型的数据结构成员就是会失败

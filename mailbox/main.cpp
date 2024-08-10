@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     // 使用单例模式的 ObjectPool
     auto& pool = ObjectPool<NewSocket>::getInstance();
-    NewSocket* newSocket1 = pool.acquire("newSocket1");
+    NewSocket* newSocket1 = pool.acquire("originUser");
     //NewSocket *newSocket = new NewSocket;
 
     bool conFlag = newSocket1->tryConnection(5);

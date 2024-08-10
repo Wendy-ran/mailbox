@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,6 +13,7 @@ TARGET = mailbox
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    newdatabase.cpp \
     newsocket.cpp \
     objectpool.cpp \
     tdialoglogin.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    newdatabase.h \
     newsocket.h \
     objectpool.h \
     tdialoglogin.h \
