@@ -4,7 +4,6 @@
 //#include    <QPainter>
 #include    <QFileDialog>
 #include    <QCloseEvent>
-
 #include    "tformdoc.h"
 #include "tdialoglogin.h"
 

@@ -31,9 +31,14 @@ public:
     void    textCut();          //cut
     void    textCopy();         //copy
     void    textPaste();        //paste
+    void createDirectoryAndFile(const QString &path, const QString &dirName, const QString &fileName);
+    QString generateRandomNumberString(int length = 64);
+    QString getCurrentFormattedTime(const QString& format = "yyyy-MM-dd-HHmmss");
 
 private slots:
     void on_btnSend_clicked();
+
+    void on_btnSave_clicked();
 
 private:
     Ui::TFormDoc *ui;

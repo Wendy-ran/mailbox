@@ -101,7 +101,13 @@ void TDialogLogin::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         m_moving = true;
-        m_lastPos = event->globalPosition().toPoint() - this->pos();
+        //m_lastPos = event->globalPosition().toPoint() - this->pos();
+        //m_lastPos = event->globalPos() - this->pos();
+        #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            m_lastPos = event->globalPosition().toPoint() - this->pos();  // Qt 6
+        #else
+            m_lastPos = event->globalPos() - this->pos();  // Qt 5
+        #endif
     }
     return QDialog::mousePressEvent(event);
 }
@@ -109,7 +115,11 @@ void TDialogLogin::mousePressEvent(QMouseEvent *event)
 //鼠标按下左键移动
 void TDialogLogin::mouseMoveEvent(QMouseEvent *event)
 {
-    QPoint eventPos=event->globalPosition().toPoint();
+    #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QPoint eventPos=event->globalPosition().toPoint();
+    #else
+        QPoint eventPos = event->globalPos();  // Qt 5
+    #endif
 
     if (m_moving && (event->buttons() & Qt::LeftButton)
         && (eventPos-m_lastPos).manhattanLength() > QApplication::startDragDistance())

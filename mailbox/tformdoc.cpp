@@ -6,6 +6,28 @@
 #include    <QFontDialog>
 #include    <QFileInfo>
 #include    <QMessageBox>
+#include <QDir>
+#include <QString>
+#include <QRandomGenerator>
+#include <QDateTime>
+
+QString TFormDoc::getCurrentFormattedTime(const QString& format) {
+    QDateTime currentTime = QDateTime::currentDateTime();  // 获取当前日期和时间
+    return currentTime.toString(format);  // 格式化并返回日期和时间
+}
+
+QString TFormDoc::generateRandomNumberString(int length) {
+    QString result;
+    result.reserve(length);  // 预留足够的空间
+
+    // 使用 QRandomGenerator 生成随机数字
+    for (int i = 0; i < length; ++i) {
+        int number = QRandomGenerator::global()->bounded(10);  // 生成 0 到 9 的数字
+        result.append(QString::number(number));
+    }
+
+    return result;
+}
 
 TFormDoc::TFormDoc(NewSocket* newSocket, QWidget *parent) :
     QWidget(parent),
@@ -99,5 +121,47 @@ void TFormDoc::on_btnSend_clicked()
         qDebug() << "curNewSocket->getId() - " << curNewSocket->getId();
         qDebug() << "ui->lineEditReceiver->text() - " << ui->lineEditReceiver->text();
     }
+}
+
+
+
+void TFormDoc::createDirectoryAndFile(const QString &path, const QString &dirName, const QString &fileName) {
+    QDir dir(path);  // 创建一个QDir实例指向需要的路径
+
+    // 检查目标目录是否存在，如果不存在则创建
+    if (!dir.exists(dirName)) {
+        if (dir.mkdir(dirName)) {
+            qDebug() << "Directory created successfully.";
+        } else {
+            qDebug() << "Failed to create directory.";
+            return;  // 如果创建目录失败，直接返回
+        }
+    } else {
+        qDebug() << "Directory already exists.";
+    }
+
+    // 设置文件的完整路径
+    QString filePath = QDir::cleanPath(dir.absoluteFilePath(dirName + "/" + fileName));
+
+    // 创建并打开文件
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        //out << "Hello, world!";  // 写入一些文本
+        out << this->ui->plainTextEdit->toPlainText();
+        qDebug() << this->ui->plainTextEdit->toPlainText();
+        qDebug() << "File written successfully.";
+        file.close();
+    } else {
+        qDebug() << "Failed to open file for writing.";
+    }
+}
+
+void TFormDoc::on_btnSave_clicked()
+{
+    QString baseDir = "D://OneDrive - AuroraNotebook//codeField//projects//mail//mine//files//344500";
+    QString dirName = getCurrentFormattedTime();
+    QString fileName = generateRandomNumberString() + ".txt";
+    createDirectoryAndFile(baseDir, dirName, fileName);
 }
 
