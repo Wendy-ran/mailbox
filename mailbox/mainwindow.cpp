@@ -6,6 +6,9 @@
 #include    <QCloseEvent>
 #include    "tformdoc.h"
 #include "tdialoglogin.h"
+#include <vmime/vmime.hpp>
+#include <vmime/platforms/posix/posixHandler.hpp>
+#include <iostream>
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -185,7 +188,12 @@ void MainWindow::on_actDoc_Save_triggered()
 
 void MainWindow::on_actNewAcc_triggered()
 {
-    NewSocket* newSocket = new NewSocket;
-    newSockets.append(newSocket);
+    // NewSocket* newSocket = new NewSocket;
+    // newSockets.append(newSocket);
+}
+
+void MainWindow::on_actPullMails_triggered()
+{
+
 }
 

@@ -18,7 +18,7 @@ class MainWindow : public QMainWindow
 private:
     QString id;
     QString code;
-    QVector<NewSocket*> newSockets;
+    //QVector<NewSocket*> newSockets;
     NewSocket* curNewSocket = nullptr;
 
     //枚举类型treeItemType， 用于创建 QTreeWidgetItem 时作为节点的type, 自定义类型必须大于1000
@@ -65,6 +65,8 @@ private slots:
 //    void on_actViewMode_triggered();
 
     void on_actNewAcc_triggered();
+
+    void on_actPullMails_triggered();
 
 private:
     Ui::MainWindow *ui;

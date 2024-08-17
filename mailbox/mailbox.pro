@@ -4,6 +4,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+INCLUDEPATH += /usr/include/openssl
+LIBS += -L/usr/lib/x86_64-linux-gnu -lssl
+LIBS += -L/usr/lib/x86_64-linux-gnu -lcrypto
+
+#libcurl 库
+# unix:!macx: LIBS += -lcurl
+# INCLUDEPATH += /usr/include
+# DEPENDPATH += /usr/include
+
 TARGET = mailbox
 
 SOURCES += \
@@ -13,7 +22,8 @@ SOURCES += \
     newsocket.cpp \
     objectpool.cpp \
     tdialoglogin.cpp \
-    tformdoc.cpp
+    tformdoc.cpp \
+    utils.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -21,7 +31,9 @@ HEADERS += \
     newsocket.h \
     objectpool.h \
     tdialoglogin.h \
-    tformdoc.h
+    tdialoglogin.h \
+    tformdoc.h \
+    utils.h
 
 FORMS += \
     mainwindow.ui \
@@ -36,3 +48,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
    res.qrc \
    res.qrc
+

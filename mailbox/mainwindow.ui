@@ -255,6 +255,14 @@
     <string>Ctrl+S</string>
    </property>
   </action>
+  <action name="actPullMails">
+   <property name="text">
+    <string>pull</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

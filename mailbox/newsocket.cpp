@@ -68,6 +68,11 @@ QString NewSocket::getId()
     return id;
 }
 
+QString NewSocket::getCode()
+{
+    return code;
+}
+
 bool NewSocket::sendEmail(const QString &from, const QString &to, const QString &subject, const QString &body)
 {
     sendCommand("MAIL FROM:<" + from + ">");

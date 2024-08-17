@@ -1,50 +1,126 @@
 #include "mainwindow.h"
-
 #include <QApplication>
-#include    "tdialogLogin.h"
+#include    "tdialoglogin.h"
 #include <QTcpSocket>
 #include "newsocket.h"
 #include <QMessageBox>
 #include "objectpool.h"
 #include <QSslSocket>
 #include <QNetworkAccessManager>
-#include <QSslSocket>
-
+// #include <vmime/vmime.hpp>
+#include <iostream>
 // #include <cryptlib.h>
 // #include <osrng.h>
-// #include <iostream>
+#include <openssl/aes.h>
+#include <openssl/rand.h>
+#include <cstring>
+
+// #include <vmime/vmime.hpp>
+// #include <vmime/platforms/posix/posixHandler.hpp>
+
+int encrypt(unsigned char* plaintext, int plaintext_len, unsigned char* key,
+            unsigned char* iv, unsigned char* ciphertext) {
+    AES_KEY enc_key;
+    AES_set_encrypt_key(key, 256, &enc_key);
+    AES_cbc_encrypt(plaintext, ciphertext, plaintext_len, &enc_key, iv, AES_ENCRYPT);
+    return 0;
+}
+
+int decrypt(unsigned char* ciphertext, int ciphertext_len, unsigned char* key,
+            unsigned char* iv, unsigned char* plaintext) {
+    AES_KEY dec_key;
+    AES_set_decrypt_key(key, 256, &dec_key);
+    AES_cbc_encrypt(ciphertext, plaintext, ciphertext_len, &dec_key, iv, AES_DECRYPT);
+    return 0;
+}
+
+// void fetchEmailsFromQQ() {
+//     try {
+//         // 创建 vmime 的 session
+//         vmime::shared_ptr<vmime::net::session> sess = vmime::make_shared<vmime::net::session>();
+
+//         // 设置连接 URL
+//         vmime::utility::url url("imaps://imap.qq.com:993");
+//         vmime::shared_ptr<vmime::net::store> store = sess->getStore(url);
+//         store->setProperty("options.need-authentication", true);
+//         store->setProperty("auth.username", "2186362422@qq.com");
+//         store->setProperty("auth.password", "lddvdbkivnapchcb");
+//         store->setProperty("connection.tls", true);  // 使用 TLS
+
+//         // 连接到邮箱服务器
+//         store->connect();
+
+//         // 使用 vmime::utility::path 创建路径
+//         vmime::utility::path folderPath;
+//         folderPath.appendComponent(vmime::word("INBOX"));
+
+//         // 打开 INBOX 文件夹
+//         vmime::shared_ptr<vmime::net::folder> folder = store->getDefaultFolder()->getFolder(folderPath);
+//         folder->open(vmime::net::folder::MODE_READ_ONLY);
+
+//         // 获取邮件数量
+//         vmime::size_t count = folder->getMessageCount();
+//         std::vector<vmime::shared_ptr<vmime::net::message>> messages = folder->getMessages(vmime::net::messageSet::byNumber(1, count));
+
+//         // 拉取邮件信息
+//         folder->fetchMessages(messages, vmime::net::fetchAttributes::ENVELOPE);
+//         for (const auto& msg : messages) {
+//             vmime::shared_ptr<const vmime::header> hdr = msg->getHeader();
+//             std::cout << "Subject: " << hdr->Subject()->getValue<vmime::string>() << std::endl;
+//         }
+
+//         // 关闭文件夹和断开连接
+//         folder->close(false);
+//         store->disconnect();
+//     } catch (const vmime::exception& e) {
+//         std::cerr << "VMime exception: " << e.what() << std::endl;
+//     } catch (const std::exception& e) {
+//         std::cerr << "Standard exception: " << e.what() << std::endl;
+//     }
+// }
+
+bool isSSL() {
+    qDebug()<< "ssl: " << QSslSocket::sslLibraryBuildVersionString();
+    qDebug() << "SSL library Build Version String:" << QSslSocket::sslLibraryBuildVersionString();
+    unsigned char key[AES_BLOCK_SIZE]; // AES_BLOCK_SIZE = 16
+    unsigned char iv[AES_BLOCK_SIZE];
+    unsigned char plaintext[128] = "Hello, world! This is a test message.";
+    unsigned char ciphertext[128];
+    unsigned char decryptedtext[128];
+
+    // Generate random key and IV
+    if (!RAND_bytes(key, sizeof(key)) || !RAND_bytes(iv, sizeof(iv))) {
+        std::cerr << "Error generating random bytes.\n";
+        return false;
+    }
+
+    std::cout << "Plaintext: " << plaintext << std::endl;
+
+    // Encrypt the plaintext
+    encrypt(plaintext, sizeof(plaintext), key, iv, ciphertext);
+    std::cout << "Ciphertext: ";
+    for (int i = 0; i < sizeof(ciphertext); i++) {
+        printf("%x", ciphertext[i]);
+    }
+    std::cout << std::endl;
+
+    // Decrypt the ciphertext
+    decrypt(ciphertext, sizeof(ciphertext), key, iv, decryptedtext);
+    std::cout << "Decrypted text: " << decryptedtext << std::endl;
+    return true;
+}
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    qDebug()<< "ssl: " << QSslSocket::sslLibraryBuildVersionString();
-    // 指定 OpenSSL 库的路径
-    // qputenv("OPENSSL_CONF", "D://apps//OpenSSL-Win64//bin//cnf//openssl.cnf");
-    // qputenv("SSL_CERT_FILE", "D://apps//OpenSSL-Win64//bin//PEM//cert.pem");
+    //isVmime();
 
-    qDebug() << "SSL library Build Version String:" << QSslSocket::sslLibraryBuildVersionString();
+    if (isSSL()) {
+        qWarning() << "OpenSSL can't work";
+    }
 
-
-    //看看是否配置了ssl
-    QNetworkAccessManager *manager = new QNetworkAccessManager();
-    qDebug() << manager->supportedSchemes();
-    qDebug() << "-----------------------------------------";
-
-    // try {
-    //     CryptoPP::AutoSeededRandomPool rng;
-    //     CryptoPP::byte key[16]; // 128-bit key
-    //     rng.GenerateBlock(key, sizeof(key));
-
-    //     std::cout << "Generated key: ";
-    //     for (int i = 0; i < sizeof(key); ++i) {
-    //         std::cout << std::hex << (int)key[i];
-    //     }
-    //     std::cout << std::endl;
-    // } catch (const CryptoPP::Exception& e) {
-    //     std::cerr << "Crypto++ error: " << e.what() << std::endl;
-    //     //return 1;
-    // }
+    //fetchEmailsFromQQ();
 
     // 使用单例模式的 ObjectPool
     auto& pool = ObjectPool<NewSocket>::getInstance();
@@ -72,3 +148,5 @@ int main(int argc, char *argv[])
 // MainWindow w;
 // w.show();
 // return a.exec();
+
+

@@ -13,45 +13,16 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QFile>
 #include <QIODevice>
-
-QJsonObject TDialogLogin::readJsonFile(const QString& filePath) {
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Cannot open file for reading");
-        return {};
-    }
-
-    QByteArray jsonData = file.readAll();
-    file.close();
-
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    if (!doc.isObject()) {
-        qWarning("JSON document is not an object");
-        return {};
-    }
-
-    return doc.object();
-}
-
-bool TDialogLogin::writeJsonToFile(QString filePath, QJsonObject jsonObject) {
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "Failed to open file for writing:" << filePath;
-        return false;
-    }
-
-    QJsonDocument document(jsonObject);
-    file.write(document.toJson(QJsonDocument::Indented));
-    file.close();
-    return true;
-}
+#include "utils.h"
+#include <QScreen>
+#include <QGuiApplication>
+#include <QRect>
 
 void TDialogLogin::addId(QString str)
 {
     qDebug() << "wanted to add " << str;
-    QJsonObject jsonObject = readJsonFile(":/config/conf.json");
+    QJsonObject jsonObject = Utils::readJsonFile(":/config/conf.json");
     if (jsonObject.contains("userIds") && jsonObject["userIds"].isArray()) {
         QJsonArray userIds = jsonObject["userIds"].toArray();
         for (const QJsonValue& value : userIds) {
@@ -68,7 +39,7 @@ void TDialogLogin::addId(QString str)
     }
 
     // TODO: 动态地址
-    if (!writeJsonToFile("D://OneDrive - AuroraNotebook//codeField//"
+    if (!Utils::writeJsonToFile("D://OneDrive - AuroraNotebook//codeField//"
                          "projects//mail//mine//3.1//mailbox//conf.json", jsonObject)) {
         qDebug() << "Failed to write JSON to file";
     } else {
@@ -79,7 +50,7 @@ void TDialogLogin::addId(QString str)
 void TDialogLogin::loadHisIds()
 {
     // 读取 JSON 文件
-    QJsonObject jsonObject = readJsonFile(":/config/conf.json");
+    QJsonObject jsonObject = Utils::readJsonFile(":/config/conf.json");
     if (jsonObject.isEmpty()) {
         qWarning("JSON object is empty or file could not be read.");
         return; // 或者处理错误情况
@@ -147,6 +118,16 @@ TDialogLogin::TDialogLogin(NewSocket *newSocket, QWidget *parent)
     ui(new Ui::TDialogLogin)
 {
     ui->setupUi(this);
+
+    // 居中窗口的代码
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect screenGeometry = screen->geometry();
+    int x = (screenGeometry.width() - this->width()) / 2;
+    int y = (screenGeometry.height() - this->height()) / 2;
+    this->move(x, y);
+    qDebug() << "Window size:" << this->size();
+    qDebug() << "Screen geometry:" << screenGeometry;
+    qDebug() << "Calculated position x, y:" << x << y;
 
     if (!newSocket) {
         throw std::invalid_argument("newSocket parameter cannot be nullptr");

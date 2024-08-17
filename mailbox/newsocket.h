@@ -34,6 +34,7 @@ public:
     bool writeLetter(const QString &from, const QString &to, const QString &subject, const QString &body);
 
     QString getId();
+    QString getCode();
     QTcpSocket* getSocket();
     bool socketState();
     //void printVar();

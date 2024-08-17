@@ -1,4 +1,4 @@
-﻿#ifndef TDIALOGLOGIN_H
+#ifndef TDIALOGLOGIN_H
 #define TDIALOGLOGIN_H
 
 #include <QDialog>
