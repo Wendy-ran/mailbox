@@ -8,7 +8,8 @@ class Utils {
 public:
     static QJsonObject readJsonFile(const QString& filePath);
     static bool writeJsonToFile(QString filePath, QJsonObject jsonObject);
-
+    static QString readLineFromFile(const QString& filePath, int lineNumber);
+    static bool containsNonEnglish(const QString &text);
 };
 
 #endif // UTILS_H

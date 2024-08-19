@@ -51,6 +51,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actDoc_New"/>
+   <addaction name="actPullMails"/>
    <addaction name="actDoc_Open"/>
    <addaction name="actDoc_Save"/>
    <addaction name="actCloseALL"/>
@@ -257,7 +258,7 @@
   </action>
   <action name="actPullMails">
    <property name="text">
-    <string>pull</string>
+    <string>收取</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

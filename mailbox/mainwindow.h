@@ -5,6 +5,8 @@
 #include    <QMdiSubWindow>
 #include <QVector>
 #include "newsocket.h"
+#include <QTreeWidgetItem>
+#include <QMap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {class MainWindow;}
@@ -27,6 +29,7 @@ private:
     //枚举类型，表示列号
     //enum    treeColNum{colItem=0, colItemType=1, colDate}; //目录树列的编号定义
     void iniTree();
+    QMap<QString, QTreeWidgetItem*> treeRootItems;
 
 protected:
     void closeEvent(QCloseEvent *event); //主窗口关闭时关闭所有子窗口
@@ -67,6 +70,9 @@ private slots:
     void on_actNewAcc_triggered();
 
     void on_actPullMails_triggered();
+
+public slots:
+    void onTransferBoxNames(QStringList names);
 
 private:
     Ui::MainWindow *ui;

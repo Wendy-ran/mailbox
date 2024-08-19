@@ -167,7 +167,7 @@ QString TDialogLogin::getCode()
 //"确定"按钮响应
 void TDialogLogin::on_btnOK_clicked()
 {
-    user = ui->editUser->currentText().trimmed() + "@qq.com";    //输入的用户名
+    user = ui->editUser->currentText().trimmed();    //输入的用户名
     pswd = ui->editPSWD->text().trimmed();    //输入的密码
     //QString encrptPSWD=encrypt(pswd);   //对输入的密码进行加密
     if (m_newSocket->login(user, pswd)) {

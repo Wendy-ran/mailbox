@@ -3,13 +3,15 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QSslSocket>
 
 class NewSocket : public QObject
 {
     Q_OBJECT
 
 private:
-    QTcpSocket *socket;
+    QTcpSocket *tcpSocket;
+    QSslSocket *sslSocket;
 
     // 标志
     bool flag = true;
@@ -20,25 +22,33 @@ private:
     QString id = "";
     QString code = "";
 
+    //QString strBoxName;
+
 public:
     //NewSocket();
     NewSocket(QObject *parent = nullptr);
     ~NewSocket();
 
-    bool tryConnection(int num);    
-    void sendCommand(QString command);
+    bool tryConnection(QString server, int num = 5);
+    void sendCommand(QString command, QString serverName);
     bool login(QString id, QString code);
     bool readResponse();
     bool sendEmail(const QString& from, const QString& to,
                    const QString& subject, const QString& body);
     bool writeLetter(const QString &from, const QString &to, const QString &subject, const QString &body);
 
+    bool getBoxNames();
+    // 收取历史邮件  多个重载函数
+    bool getHisLetters();
+
     QString getId();
     QString getCode();
-    QTcpSocket* getSocket();
-    bool socketState();
+    QTcpSocket* getTcpSocket();
+    QSslSocket* getSslSocket();
+    bool socketState(QString socketName);
     //void printVar();
     void connections();
+    QString matchBoxName(QString origin);
 
 private slots:
     void connectToServer();
@@ -47,9 +57,14 @@ private slots:
     void onErrorConnection();
     //void onConnected();
     //void onAuth();
+    void onEncrypted();
+    void onSslErrors(const QList<QSslError>& msgs);
+    void onBoxNames(QString names);
 
 signals:
     //void authSucc();
+    void gotBoxNames(QString names);
+    void transferBoxNames(QStringList names);
 };
 
 #endif // NEWSOCKET_H

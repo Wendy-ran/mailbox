@@ -5,10 +5,10 @@
 #include    <QFileDialog>
 #include    <QCloseEvent>
 #include    "tformdoc.h"
-#include "tdialoglogin.h"
-#include <vmime/vmime.hpp>
-#include <vmime/platforms/posix/posixHandler.hpp>
-#include <iostream>
+//#include "tdialoglogin.h"
+//#include <vmime/vmime.hpp>
+//#include <vmime/platforms/posix/posixHandler.hpp>
+//#include <iostream>
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -19,23 +19,24 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::iniTree() {
     ui->treeWidget->clear();
 
-    ui->treeWidget->expandAll(); // 默认展开所有项
+    //ui->treeWidget->expandAll(); // 默认展开所有项
 
     ui->treeWidget->setColumnCount(1);
     ui->treeWidget->setHeaderHidden(true);
 
     // 添加根节点
-    QTreeWidgetItem* rootItem = new QTreeWidgetItem(ui->treeWidget);
-    rootItem->setText(0, id);
+    QTreeWidgetItem* treeRootItem = new QTreeWidgetItem(ui->treeWidget);
+    treeRootItem->setText(0, curNewSocket->getId());
     //rootItem->setIcon(0, QIcon(":/icons/folder.png"));
+    treeRootItems.insert(curNewSocket->getId(), treeRootItem);
 
     // 添加子节点
-    QTreeWidgetItem* childItem1 = new QTreeWidgetItem(rootItem);
-    childItem1->setText(0, "收件箱");
+    //QTreeWidgetItem* childItem1 = new QTreeWidgetItem(rootItem);
+    //childItem1->setText(0, "收件箱");
     //childItem1->setIcon(0, QIcon(":/icons/star.png"));
 
-    QTreeWidgetItem* childItem2 = new QTreeWidgetItem(rootItem);
-    childItem2->setText(0, "草稿箱");
+    //QTreeWidgetItem* childItem2 = new QTreeWidgetItem(rootItem);
+    //childItem2->setText(0, "草稿箱");
     //childItem2->setIcon(0, QIcon(":/icons/tag.png"));
 }
 
@@ -57,6 +58,8 @@ MainWindow::MainWindow(NewSocket *newSocket, QWidget *parent) :
 
     // 初始化 QTreeWidget
     iniTree();
+
+    connect(curNewSocket, SIGNAL(transferBoxNames(QStringList)), this, SLOT(onTransferBoxNames(QStringList)));
 }
 
 MainWindow::~MainWindow()
@@ -194,6 +197,25 @@ void MainWindow::on_actNewAcc_triggered()
 
 void MainWindow::on_actPullMails_triggered()
 {
+    // on_actPullMails_triggered(); 手动调用这个槽函数
 
+    // 收取邮件需要连接 imap
+    curNewSocket->tryConnection("imap.qq.com");
+    //QStringList boxList;
+    if (!curNewSocket->getBoxNames()) {
+        qWarning() << "mainwindow: 没有获取到文件夹的名字";
+    }
+
+}
+
+void MainWindow::onTransferBoxNames(QStringList names)
+{
+    QTreeWidgetItem* childItem, *rootItem = treeRootItems.value(curNewSocket->getId());
+    for (const QString &name: names) {
+        childItem = new QTreeWidgetItem(rootItem);
+        childItem->setText(0, name);
+    }
+    ui->treeWidget->update();
+    ui->treeWidget->expandAll();
 }
 

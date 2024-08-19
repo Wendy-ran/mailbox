@@ -4,9 +4,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
-INCLUDEPATH += /usr/include/openssl
-LIBS += -L/usr/lib/x86_64-linux-gnu -lssl
-LIBS += -L/usr/lib/x86_64-linux-gnu -lcrypto
+# INCLUDEPATH += /usr/include/openssl
+# LIBS += -L/usr/lib/x86_64-linux-gnu -lssl
+# LIBS += -L/usr/lib/x86_64-linux-gnu -lcrypto
 
 #libcurl 库
 # unix:!macx: LIBS += -lcurl
