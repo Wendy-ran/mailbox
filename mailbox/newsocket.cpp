@@ -20,7 +20,7 @@ void NewSocket::connections()
     //connect(sslSocket, &QSslSocket::readyRead, this, &NewSocket::getMessage);
     connect(sslSocket, &QSslSocket::disconnected, this, &NewSocket::disconnectFromServer);
     connect(sslSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(onSslErrors(const QList<QSslError>&)));
-    connect(this, SIGNAL(gotBoxNames(QString)), this, SLOT(onBoxNames(QString)));
+    //connect(this, SIGNAL(gotBoxNames(QString)), this, SLOT(onBoxNames(QString)));
 }
 
 void NewSocket::connectToServer()
