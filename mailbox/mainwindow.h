@@ -71,6 +71,8 @@ private slots:
 
     void on_actPullMails_triggered();
 
+    void onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+
 public slots:
     void onTransferBoxNames(QStringList names);
 

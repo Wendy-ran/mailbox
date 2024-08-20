@@ -10,6 +10,7 @@ public:
     static bool writeJsonToFile(QString filePath, QJsonObject jsonObject);
     static QString readLineFromFile(const QString& filePath, int lineNumber);
     static bool containsNonEnglish(const QString &text);
+    static QString decodeBase64(const QString &base64EncodedText);
 };
 
 #endif // UTILS_H

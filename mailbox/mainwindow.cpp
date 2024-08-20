@@ -208,6 +208,23 @@ void MainWindow::on_actPullMails_triggered()
 
 }
 
+void MainWindow::onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    QString box = current->text(0);
+
+    if (box == "收件箱") {
+
+    } else if (box == "已发送") {
+
+    } else if (box == "草稿箱") {
+
+    } else if (box == "垃圾箱") {
+
+    } else if (box == "垃圾邮件") {
+
+    }
+}
+
 void MainWindow::onTransferBoxNames(QStringList names)
 {
     QTreeWidgetItem* childItem, *rootItem = treeRootItems.value(curNewSocket->getId());

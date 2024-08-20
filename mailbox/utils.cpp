@@ -71,3 +71,13 @@ bool Utils::containsNonEnglish(const QString &text) {
     return match.hasMatch();  // 如果有匹配，返回 true
 }
 
+QString Utils::decodeBase64(const QString &base64EncodedText) {
+    // 从 Base64 编码的 QString 创建 QByteArray
+    QByteArray decodedByteArray = QByteArray::fromBase64(base64EncodedText.toUtf8());
+
+    // 将 QByteArray 转换回 QString（假设原始文本是 UTF-8 编码的）
+    QString decodedText = QString::fromUtf8(decodedByteArray);
+
+    return decodedText;
+}
+
