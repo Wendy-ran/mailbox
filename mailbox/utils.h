@@ -11,6 +11,8 @@ public:
     static QString readLineFromFile(const QString& filePath, int lineNumber);
     static bool containsNonEnglish(const QString &text);
     static QString decodeBase64(const QString &base64EncodedText);
+    static QStringList extractBoxNames(QString msg);
+    static QString matchBoxName(QString origin);
 };
 
 #endif // UTILS_H

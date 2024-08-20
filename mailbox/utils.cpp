@@ -81,3 +81,46 @@ QString Utils::decodeBase64(const QString &base64EncodedText) {
     return decodedText;
 }
 
+QStringList Utils::extractBoxNames(QString msg)
+{
+    QStringList boxNames = msg.split("\r\n", Qt::SkipEmptyParts), res;
+
+    //QList<QString> folderNames;
+    QRegularExpression regex(R"(\* LIST.*\"/\" \"(.*?)\")");  // 正则表达式匹配包含文件夹名的模式
+
+    for (const QString &boxName : boxNames) {
+        QRegularExpressionMatch match = regex.match(boxName);
+        if (match.hasMatch()) {
+            QString name = match.captured(1); // 提取第一个捕获组，即文件夹名
+            qDebug() << "Box: " << name;
+
+            if (!Utils::containsNonEnglish(name)) {
+                name = matchBoxName(name);
+                res.append(name);
+            }
+        }
+    }
+
+    return res;
+}
+
+QString Utils::matchBoxName(QString origin)
+{
+    QString ret = "";
+
+    if (origin == "INBOX") {
+        ret = "收件箱";
+    } else if (origin == "Sent Messages") {
+        ret = "已发送";
+    } else if (origin == "Drafts") {
+        ret = "草稿箱";
+    } else if (origin == "Deleted Messages") {
+        ret = "垃圾箱";
+    } else if (origin == "Junk") {
+        ret = "垃圾邮件";
+    } else {
+        qWarning() << "newsocket: 不匹配任何邮箱文件名";
+    }
+
+    return ret;
+}

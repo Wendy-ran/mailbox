@@ -10,6 +10,11 @@
 //#include <vmime/platforms/posix/posixHandler.hpp>
 //#include <iostream>
 
+void MainWindow::connections()
+{
+    //connect(curNewSocket, SIGNAL(transferBoxNames(QStringList)), this, SLOT(onTransferBoxNames(QStringList)));
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     ui->mdiArea->closeAllSubWindows();  //关闭所有子窗口
@@ -59,7 +64,7 @@ MainWindow::MainWindow(NewSocket *newSocket, QWidget *parent) :
     // 初始化 QTreeWidget
     iniTree();
 
-    connect(curNewSocket, SIGNAL(transferBoxNames(QStringList)), this, SLOT(onTransferBoxNames(QStringList)));
+    connections();
 }
 
 MainWindow::~MainWindow()
@@ -201,32 +206,13 @@ void MainWindow::on_actPullMails_triggered()
 
     // 收取邮件需要连接 imap
     curNewSocket->tryConnection("imap.qq.com");
-    //QStringList boxList;
-    if (!curNewSocket->getBoxNames()) {
+
+    QStringList names = curNewSocket->getBoxNames();
+    if (names.isEmpty()) {
         qWarning() << "mainwindow: 没有获取到文件夹的名字";
+        return;
     }
 
-}
-
-void MainWindow::onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous)
-{
-    QString box = current->text(0);
-
-    if (box == "收件箱") {
-
-    } else if (box == "已发送") {
-
-    } else if (box == "草稿箱") {
-
-    } else if (box == "垃圾箱") {
-
-    } else if (box == "垃圾邮件") {
-
-    }
-}
-
-void MainWindow::onTransferBoxNames(QStringList names)
-{
     QTreeWidgetItem* childItem, *rootItem = treeRootItems.value(curNewSocket->getId());
     for (const QString &name: names) {
         childItem = new QTreeWidgetItem(rootItem);
@@ -235,4 +221,32 @@ void MainWindow::onTransferBoxNames(QStringList names)
     ui->treeWidget->update();
     ui->treeWidget->expandAll();
 }
+
+// void MainWindow::onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+// {
+//     // QString box = current->text(0);
+
+//     // if (box == "收件箱") {
+
+//     // } else if (box == "已发送") {
+
+//     // } else if (box == "草稿箱") {
+
+//     // } else if (box == "垃圾箱") {
+
+//     // } else if (box == "垃圾邮件") {
+
+//     // }
+// }
+
+// void MainWindow::onTransferBoxNames(QStringList names)
+// {
+//     QTreeWidgetItem* childItem, *rootItem = treeRootItems.value(curNewSocket->getId());
+//     for (const QString &name: names) {
+//         childItem = new QTreeWidgetItem(rootItem);
+//         childItem->setText(0, name);
+//     }
+//     ui->treeWidget->update();
+//     ui->treeWidget->expandAll();
+// }
 

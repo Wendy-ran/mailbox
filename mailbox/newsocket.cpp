@@ -7,6 +7,22 @@
 #include "utils.h"
 //#include "mainwindow.h"
 
+
+void NewSocket::connections()
+{
+    connect(tcpSocket, SIGNAL(connected()), this, SLOT(connectToServer()));
+    connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(disconnectFromServer()));
+    connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(getMessage()));
+    connect(tcpSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(onErrorConnection()));
+
+    connect(sslSocket, &QSslSocket::connected, this, &NewSocket::connectToServer);
+    connect(sslSocket, &QSslSocket::encrypted, this, &NewSocket::onEncrypted);
+    //connect(sslSocket, &QSslSocket::readyRead, this, &NewSocket::getMessage);
+    connect(sslSocket, &QSslSocket::disconnected, this, &NewSocket::disconnectFromServer);
+    connect(sslSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(onSslErrors(const QList<QSslError>&)));
+    connect(this, SIGNAL(gotBoxNames(QString)), this, SLOT(onBoxNames(QString)));
+}
+
 void NewSocket::connectToServer()
 {
     QObject *obj = sender();
@@ -44,9 +60,9 @@ void NewSocket::getMessage()
     } else if (obj == sslSocket) {
         message = sslSocket->readAll();
 
-        if (message.contains("* LIST ")) {  // 文件夹列表
-            emit gotBoxNames(message);
-        }
+        // if (message.contains("* LIST ")) {  // 文件夹列表
+        //     emit gotBoxNames(message);
+        // }
     } else {
         qDebug() << "unkown sender";
         return;
@@ -61,7 +77,6 @@ void NewSocket::getMessage()
 void NewSocket::onErrorConnection()
 {
     qWarning() << "newsocket: 连接错误：" << tcpSocket->errorString();
-    //this->reject();
 }
 
 void NewSocket::onEncrypted()
@@ -77,28 +92,28 @@ void NewSocket::onSslErrors(const QList<QSslError> &msgs)
     }
 }
 
-void NewSocket::onBoxNames(QString names)
-{
-    QStringList boxNames = names.split("\r\n", Qt::SkipEmptyParts), res;
+// void NewSocket::onBoxNames(QString names)
+// {
+//     QStringList boxNames = names.split("\r\n", Qt::SkipEmptyParts), res;
 
-    //QList<QString> folderNames;
-    QRegularExpression regex(R"(\* LIST.*\"/\" \"(.*?)\")");  // 正则表达式匹配包含文件夹名的模式
+//     //QList<QString> folderNames;
+//     QRegularExpression regex(R"(\* LIST.*\"/\" \"(.*?)\")");  // 正则表达式匹配包含文件夹名的模式
 
-    for (const QString &boxName : boxNames) {
-        QRegularExpressionMatch match = regex.match(boxName);
-        if (match.hasMatch()) {
-            QString name = match.captured(1); // 提取第一个捕获组，即文件夹名
-            qDebug() << "Box:" << name;
+//     for (const QString &boxName : boxNames) {
+//         QRegularExpressionMatch match = regex.match(boxName);
+//         if (match.hasMatch()) {
+//             QString name = match.captured(1); // 提取第一个捕获组，即文件夹名
+//             qDebug() << "Box:" << name;
 
-            if (!Utils::containsNonEnglish(name)) {
-                name = matchBoxName(name);
-                res.append(name);
-            }
-        }
-    }
+//             if (!Utils::containsNonEnglish(name)) {
+//                 name = matchBoxName(name);
+//                 res.append(name);
+//             }
+//         }
+//     }
 
-    emit transferBoxNames(res);
-}
+//     emit transferBoxNames(res);
+// }
 
 NewSocket::NewSocket(QObject *parent) : QObject(parent) {
     qDebug() << "创建了一个 newSocket 对象";
@@ -169,7 +184,7 @@ bool NewSocket::sendEmail(const QString &from, const QString &to, const QString 
     //if (!readResponse()) return false;
     if (!flag) return flag;
 
-    //TODO: 需要有一个地方可以解除连接  socket->disconnectFromHost();
+    // TODO: 需要有一个地方可以解除连接  socket->disconnectFromHost();
     return true;
 }
 
@@ -190,65 +205,33 @@ bool NewSocket::writeLetter(const QString &from, const QString &to, const QStrin
     return flag;
 }
 
-bool NewSocket::getBoxNames()
+QStringList NewSocket::getBoxNames()
 {
     //QStringList list;
     // 列举出所有的文件夹
     QString str = Utils::readLineFromFile(":/config/something.txt", 1);  //a1 LIST "" "*"
     sendCommand(str, "imap.qq.com");
-    if (!sslSocket->waitForReadyRead()) {
-        //QString message = sslSocket->readAll();
+    if (sslSocket->waitForReadyRead()) {
+        QString message = sslSocket->readAll();
+        qDebug() << "-- 服务器：" << message;
+        return Utils::extractBoxNames(message);
 
-        //QStringList lines = message.split("\r\n", Qt::SkipEmptyParts);
+        // QStringList lines = message.split("\r\n", Qt::SkipEmptyParts);
         // for (const QString &line: lines) {
+
         //     qDebug() << "-- 服务器：" << line;
         // }
+    } else {
         qWarning() << "newsocket: 没有读到 imap 回复";
-        return false;
+        //return false;
     }
     //return list;
-    return true;
+    //return true;
 }
 
 bool NewSocket::getHisLetters()
 {
     return true;
-}
-
-void NewSocket::connections()
-{
-    connect(tcpSocket, SIGNAL(connected()), this, SLOT(connectToServer()));
-    connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(disconnectFromServer()));
-    connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(getMessage()));
-    connect(tcpSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(onErrorConnection()));
-
-    connect(sslSocket, &QSslSocket::connected, this, &NewSocket::connectToServer);
-    connect(sslSocket, &QSslSocket::encrypted, this, &NewSocket::onEncrypted);
-    connect(sslSocket, &QSslSocket::readyRead, this, &NewSocket::getMessage);
-    connect(sslSocket, &QSslSocket::disconnected, this, &NewSocket::disconnectFromServer);
-    connect(sslSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(onSslErrors(const QList<QSslError>&)));
-    connect(this, SIGNAL(gotBoxNames(QString)), this, SLOT(onBoxNames(QString)));
-}
-
-QString NewSocket::matchBoxName(QString origin)
-{
-    QString ret = "";
-
-    if (origin == "INBOX") {
-        ret = "收件箱";
-    } else if (origin == "Sent Messages") {
-        ret = "已发送";
-    } else if (origin == "Drafts") {
-        ret = "草稿箱";
-    } else if (origin == "Deleted Messages") {
-        ret = "垃圾箱";
-    } else if (origin == "Junk") {
-        ret = "垃圾邮件";
-    } else {
-        qWarning() << "newsocket: 不匹配任何邮箱文件名";
-    }
-
-    return ret;
 }
 
 bool NewSocket::tryConnection(QString server, int num)
@@ -289,18 +272,23 @@ bool NewSocket::tryConnection(QString server, int num)
         sslSocket->abort();
 
         sslSocket->connectToHostEncrypted("imap.qq.com", 993);
-        if (!sslSocket->waitForConnected(30000)) {
+        if (sslSocket->waitForConnected(30000)) {
+            if (sslSocket->waitForReadyRead()) {
+                qDebug() << "-- 服务器：" << sslSocket->readAll();
+            }
+        } else {
             qWarning() << "newsocket: 无法连接 imap.qq.com 服务器，" << sslSocket->errorString();
+            return false;
         }
-        //qDebug() << "-- 服务器：" << sslSocket->readAll();
 
         if (id != "" && code != "") {
             sendCommand("A1 LOGIN " + id + " " + code, "imap.qq.com");
-            if (!sslSocket->waitForReadyRead()) {
+            if (sslSocket->waitForReadyRead()) {
+                qDebug() << "-- 服务器：" << sslSocket->readAll();
+            } else {
                 qWarning() << "sslSocket 登陆失败";
                 return false;
             }
-            //qDebug() << "-- 服务器：" << sslSocket->readAll();
         } else {
             qWarning() << "newsocket: id 和 code 未赋值";
             return false;
@@ -372,12 +360,12 @@ QSslSocket *NewSocket::getSslSocket()
     return sslSocket;
 }
 
-bool NewSocket::readResponse() {
-    while (!tcpSocket->waitForReadyRead(30000)) {
-        qDebug() << "Waiting...";
-    }
-    QString response = tcpSocket->readAll();
-    qDebug() << "Response:" << response;
-    return response.startsWith("2") || response.startsWith("3");
-}
+// bool NewSocket::readResponse() {
+//     while (!tcpSocket->waitForReadyRead(30000)) {
+//         qDebug() << "Waiting...";
+//     }
+//     QString response = tcpSocket->readAll();
+//     qDebug() << "Response:" << response;
+//     return response.startsWith("2") || response.startsWith("3");
+// }
 

@@ -31,6 +31,8 @@ private:
     void iniTree();
     QMap<QString, QTreeWidgetItem*> treeRootItems;
 
+    void connections();
+
 protected:
     void closeEvent(QCloseEvent *event); //主窗口关闭时关闭所有子窗口
 
@@ -61,7 +63,7 @@ private slots:
 
     void on_actCloseALL_triggered(); //关闭全部子窗口
 
-    void on_actDoc_Save_triggered();
+    void on_actDoc_Save_triggered();  // 保存
 
 //    void on_actViewMode_triggered();
 
@@ -69,12 +71,12 @@ private slots:
 
     void on_actNewAcc_triggered();
 
-    void on_actPullMails_triggered();
+    void on_actPullMails_triggered();  // 收取邮件
 
-    void onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+    //void onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
 public slots:
-    void onTransferBoxNames(QStringList names);
+    //void onTransferBoxNames(QStringList names);
 
 private:
     Ui::MainWindow *ui;
