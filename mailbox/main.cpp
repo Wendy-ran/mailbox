@@ -110,6 +110,34 @@
 //     return true;
 // }
 
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+    QByteArray localMsg = msg.toLocal8Bit();
+    const char *file = context.file ? context.file : "unknown";
+    const char *function = context.function ? context.function : "unknown";
+
+    switch (type) {
+    case QtDebugMsg:
+        //fprintf(stderr, "\033[34mDebug: %s (%s:%u, %s)\033[0m\n", localMsg.constData(), file, context.line, function);
+        fprintf(stderr, "\x1b[37mDebug: \x1b[34m%s\x1b[37m(%s:%u, %s)\x1b[0m\n", localMsg.constData(), file, context.line, function);
+        break;
+    case QtWarningMsg:
+        //(stderr, "\033[33mWarning: %s (%s:%u, %s)\033[0m\n", localMsg.constData(), file, context.line, function);
+        fprintf(stderr, "\x1b[37mWarning: \033[33m%s\x1b[37m(%s:%u, %s)\x1b[0m\n", localMsg.constData(), file, context.line, function);
+        break;
+    case QtCriticalMsg:
+        //fprintf(stderr, "\033[31mCritical: %s (%s:%u, %s)\033[0m\n", localMsg.constData(), file, context.line, function);
+        fprintf(stderr, "\x1b[37mCritical: \033[31m%s\x1b[37m(%s:%u, %s)\x1b[0m\n", localMsg.constData(), file, context.line, function);
+        break;
+    case QtFatalMsg:
+        //fprintf(stderr, "\033[35mFatal: %s (%s:%u, %s)\033[0m\n", localMsg.constData(), file, context.line, function);
+        fprintf(stderr, "\x1b[37mFatal: \033[35m%s\x1b[37m(%s:%u, %s)\x1b[0m\n", localMsg.constData(), file, context.line, function);
+        abort();
+    }
+    // fprintf(stderr, "\033[1;31m这是红色加粗的文本\033[0m\n");  \033[颜色代码m
+    // 这里的 \033[1;31m 设置文本为加粗和红色，\033[0m 用于重置样式，以防后续文本也被同样格式化
+    // fprintf(stderr, "\x1b[31m这是红色的部分\x1b[0m，\x1b[38;5;247m这是浅灰色的部分\x1b[0m，和 \x1b[34m这是蓝色的部分\x1b[0m。\n");
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -121,6 +149,11 @@ int main(int argc, char *argv[])
     // }
 
     //fetchEmailsFromQQ();
+
+    qInstallMessageHandler(customMessageHandler);  // 安装消息处理器
+    qDebug() << "This is a debug message";
+    qWarning() << "This is a warning message";
+    qCritical() << "This is a critical message";
 
     // 使用单例模式的 ObjectPool
     auto& pool = ObjectPool<NewSocket>::getInstance();
@@ -148,5 +181,8 @@ int main(int argc, char *argv[])
 // MainWindow w;
 // w.show();
 // return a.exec();
+
+
+
 
 
