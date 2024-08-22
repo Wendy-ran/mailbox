@@ -3,7 +3,6 @@
 #include <QSslError>
 #include <QRegularExpression>
 #include <QRegularExpressionMatchIterator>
-//#include "mainwindow.h"
 #include <QString>
 #include "utils.h"
 #include <QStringDecoder>
@@ -24,13 +23,13 @@ void NewSocket::connections()
     //connect(this, SIGNAL(gotBoxNames(QString)), this, SLOT(onBoxNames(QString)));
 }
 
-bool NewSocket::getMailofBox(EmailInfo &mail, QString boxName, int id)
+bool NewSocket::getMailOfBox(EmailInfo &mail, QString boxName, int id)
 {
     if (!(boxName.at(0).isLetter() && boxName.at(0).unicode() <= 127)) {
         boxName = Utils::matchBoxName(boxName);
     }
 
-    if (boxName == "INBOX") {
+    if (boxName == "INBOX") {  // 收件箱
         sendCommand("2 SELECT INBOX", "imap.qq.com");
         QString msg = "";
         if (sslSocket->waitForReadyRead()) {
@@ -56,7 +55,7 @@ bool NewSocket::getMailofBox(EmailInfo &mail, QString boxName, int id)
             return false;
         }
 
-        // 100 FETCH 1:16 BODY[header.fields (Date From Subject)]
+        // 100 FETCH xx BODY[header.fields (Date From Subject)]  单条邮件
         sendCommand("a0 FETCH " + QString::number(id) + " BODY[header.fields (Date From Subject)]", "imap.qq.com");
         if (sslSocket->waitForReadyRead()) {
             msg = sslSocket->readAll();
@@ -71,14 +70,6 @@ bool NewSocket::getMailofBox(EmailInfo &mail, QString boxName, int id)
             qWarning() << "服务器返回消息有问题";
             return false;
         }
-        // 这个变量和迭代器的赋值规范一样
-        // int beg = msg.indexOf("\r\n", 0)+2, end = msg.indexOf("\r\n\r\n", beg);
-        // //msg = msg.mid(beg, end-beg);
-        // for (int i = beg; i < end; i++) {
-        //     if (msg.at(i) == 'F') {
-
-        //     }
-        // }
 
         int index[3];
         index[0] = msg.indexOf("From: ");
@@ -90,241 +81,79 @@ bool NewSocket::getMailofBox(EmailInfo &mail, QString boxName, int id)
         extractMailInfos(msg.mid(index[1], index[2]-index[1]), mail);
         extractMailInfos(msg.mid(index[2], msg.indexOf("\r\n\r\n")-index[2]+2), mail);
 
-        // QStringList lines = msg.split("\r\n\r\n", Qt::SkipEmptyParts);
-        // for (QString &line : lines) {
-        //     if (line.contains("a0 OK FETCH Completed")) {
-        //         continue;
-        //     }
-            // 示例邮件头数据
-            // QString data = "Date: Thu, 25 Jul 2024 02:09:05 +0000 (GMT)\n"
-            //                "From: iCloud <noreply@icloud.com.cn>\n"
-            //                "Subject: =?UTF-8?B?5L2g55qEIGlDbG91ZCDlgqjlrZjnqbrpl7Tlt7Lmu6E=?=";
-
-            // 使用 QRegularExpression 提取日期、发件人和主题
-            // QRegularExpression dateRegex("Date: (.+)");
-            // QRegularExpression fromRegex("From: (.+)");
-            // QRegularExpression subjectRegex("Subject: (.+)");
-
-            // QRegularExpressionMatch dateMatch = dateRegex.match(line);
-            // QRegularExpressionMatch fromMatch = fromRegex.match(line);
-            // QRegularExpressionMatch subjectMatch = subjectRegex.match(line);
-
-            // QString date = dateMatch.hasMatch() ? dateMatch.captured(1) : "";
-            // QString from = fromMatch.hasMatch() ? fromMatch.captured(1) : "";
-            // QString subject = subjectMatch.hasMatch() ? subjectMatch.captured(1) : "";
-
-
-            /* 2 FETCH (BODY[HEADER.FIELDS (DATE FROM SUBJECT)] {212}\r\n
-
-            * From: \"=?utf-8?B?UVHpgq7nrrHlm6LpmJ8=?=\" <10000@qq.com>\r\n
-
-            * Subject: =?utf-8?B?IkZveG1haWwi5bey6I635b6X5LqG5L2g55qEUVE=?=\r\n =?utf-8?B?6YKu566x6LSm5Y+355qE6K6/6Zeu5p2D6ZmQ?=\r\n
-
-            * Date: Sat, 27 Jul 2024 10:20:18 +0800\r\n\r\n)\r\na0 OK FETCH Completed\r\n
-            */
-            // From Subject Date 出现的顺序不确定
-
-
-            // mail.date = date;
-            // mail.from = from;
-            // mail.subject = subject;
         mail.to = this->id;
         mail.messageId = id;
 
         qDebug() << "第 " << id << " 封邮件在 " << mail.date << " 发送自 " << mail.from << " ，主题是 " << mail.subject;
 
-            // 解码主题
-            // QString subject;
-            // if (!encodedSubject.isEmpty()) {
-            //     QByteArray encodedBytes = encodedSubject.toUtf8();
-            //     QByteArray decodedBytes = QByteArray::fromBase64(encodedBytes.mid(10, encodedBytes.size() - 12)); // 从 MIME 编码提取 Base64 部分
-            //     subject = QTextCodec::codecForName("UTF-8")->toUnicode(decodedBytes);
-            // }
-
-            // qDebug() << "Date:" << date;
-            // qDebug() << "From:" << from;
-            // qDebug() << "Subject:" << subject;
-        //}
         return true;
     }
     return false;
-
 }
 
-// QString NewSocket::parseAddress(const QString &address) {
-//     // 正确处理转义和字符串格式
-//     QRegularExpression addressRegex(R"(\"([^"]*)\" NIL \"([^"]*)\" \"([^"]*)\")");
-//     QRegularExpressionMatch match = addressRegex.match(address);
-//     if (match.hasMatch()) {
-//         return QString("%1@%2").arg(match.captured(2), match.captured(3));
-//     }
-//     return QString();
-// }
+bool NewSocket::getMailsOfBox(QVector<EmailInfo> &mails, QString boxName)
+{
+    if (!(boxName.at(0).isLetter() && boxName.at(0).unicode() <= 127)) {
+        boxName = Utils::matchBoxName(boxName);
+    }
 
-// bool NewSocket::reciviveByEmailId(int num, Mail& mail, QString boxName)
-// {
-//     if (!boxName.at(0).isLetter()) {
-//         boxName = Utils::matchBoxName(boxName);
-//     }
+    if (boxName == "INBOX") {  // 收件箱
+        sendCommand("2 SELECT INBOX", "imap.qq.com");
+        QString msg = "";
+        if (sslSocket->waitForReadyRead()) {
+            msg = sslSocket->readAll();
+            qDebug() << "-- 服务器：" << msg;
+        } else {
+            qWarning() << "2 SELECT INBOX 命令服务器返回失败";
+            return false;
+        }
 
-//     QVector<NewSocket::EmailInfo> emails;
-//     // INBOX
-//     sendCommand("2 SELECT INBOX", "imap.qq.com");
-//     QString msg = "";
-//     if (sslSocket->waitForReadyRead()) {
-//         msg = sslSocket->readAll();
-//         qDebug() << "-- 服务器：" << msg;
-//     } else {
-//         qWarning() << "2 SELECT INBOX 命令服务器返回失败";
-//         return false;
-//         //return emails;
-//     }
+        // 提取“总邮件数”
+        int total = 0;
+        QRegularExpression regex(R"(\* (\d+) EXISTS)");
+        match = regex.match(msg);
+        if (match.hasMatch()) {
+            total = match.captured(1).toInt();  // 将提取的数字转换为整型
+        }
+        if (total == 0) {
+            qWarning() << boxName << " 中没有邮件";
+            return false;
+        }
 
-//     // 提取“总邮件数”
-//     int total = 0;
-//     QRegularExpression regex(R"(\* (\d+) EXISTS)");
-//     match = regex.match(msg);
-//     if (match.hasMatch()) {
-//         total = match.captured(1).toInt();  // 将提取的数字转换为整型
-//     }
-//     if (total == 0) {
-//         qWarning() << boxName << " 中没有邮件";
-//         return false;
-//         //return emails;
-//     }
+        EmailInfo mail;
+        for (int i = 1; i <= total; i++) {
+            // a1 FETCH x BODY[header.fields (Date From Subject)]  单条邮件
+            sendCommand("a1 FETCH " + QString::number(i) + " BODY[header.fields (Date From Subject)]", "imap.qq.com");
+            if (sslSocket->waitForReadyRead()) {
+                msg = sslSocket->readAll();
+                qDebug() << "-- 服务器：" << msg;
+            } else {
+                qWarning() << "a1FETCH x BODY[header.fields (Date From Subject)] 命令服务器返回失败";
+                return false;
+            }
 
-//     //sendCommand("3 FETCH 1:" + QString::number(total) + " (ENVELOPE)", "imap.qq.com");
-//     sendCommand("A0a FETCH " + QString::number(num) + " RFC822", "imap.qq.com");
-//     //imap.send(QString::fromUtf8("A0a FETCH ").append( QString::number(num) ).append(" RFC822"));
-//     if (sslSocket->waitForReadyRead()) {
-//         msg = sslSocket->readAll();
-//         qDebug() << msg;
-//     } else {
-//         qWarning() << "3 FETCH 1:x 命令服务器返回失败";
-//         return false;
-//         //return emails;
-//     }
-//     // parseEmailInfos
-//     QStringList list = msg.split("\r\n", Qt::SkipEmptyParts);
-
-//     // QString str = Utils::readLineFromFile(":/config/something.txt", 2);
-//     // str = R"raw(\* \d+ FETCH \(ENVELOPE \("([^"]+)" "([^"]+)" \(([^)]+?\)*)\) \(([^)]+?\)*)\) \(([^)]+?\)*)\) \(([^)]+?\)*)\) NIL NIL NIL ""\)\))raw";
-//     // const QString complexRegexStr = R"raw(\* \d+ FETCH \(ENVELOPE \("([^"]+)" "([^"]+)" )raw"
-//     //                                 R"raw(\((?:[^()]+|\([^()]*\))*\) )raw"  // 处理可能的嵌套括号
-//     //                                 R"raw(\((?:[^()]+|\([^()]*\))*\) )raw"
-//     //                                 R"raw(\((?:[^()]+|\([^()]*\))*\) )raw"
-//     //                                 R"raw(\((?:[^()]+|\([^()]*\))*\) )raw"
-//     //                                 R"raw(NIL NIL NIL ""\)\))raw";
-//     // QRegularExpression envelopeRegex(complexRegexStr);
-
-//     // int cnt = 0;
-//     // for (const QString &line : lines) {
-//     //     qDebug() << "-- 服务器：" << line;
-
-//     //     match = envelopeRegex.match(line);
-//     //     if (match.hasMatch()) {
-//     //         EmailInfo info;
-//     //         info.date = match.captured(1);
-//     //         info.subject = Utils::decodeBase64(match.captured(2));
-//     //         info.from = parseAddress(match.captured(3));
-//     //         info.to = parseAddress(match.captured(4));
-//     //         // Assuming CC and BCC are not provided in this data
-//     //         info.messageId = match.captured(10);
-
-//     //         emails.append(info);
-
-//     //         cnt++;
-//     //         qDebug() << "第 " << cnt << " 封邮件在 " << info.date << " 发送自 " << info.from << " ，主题是 " << info.subject;
-//     //     } else {
-//     //         qWarning() << "No match found";
-//     //     }
-//     // }
-//     // return emails;
-
-//     //QStringList list = imap.data.split("\r\n");  lines
-//     //Mail mail;
-//     QString charset;
-//     for (QStringList::Iterator iter = list.begin(); iter!=list.end();++iter){
-//         if((*iter).contains("charset=\"")){
-//             charset = *iter;
-//             QStringList list = charset.split("\"");
-//             charset = list[1];
-//         }else if((*iter).contains("charset=")){
-//             charset = *iter;
-//             QStringList list = charset.split("=");
-//             charset = list[1];
-//         }
-
-//         if((*iter).contains("Subject")){
-//             if((*iter).contains("?B?")){
-//                 QString text = (*iter);
-//                 text = parseSubject(text,charset);
-//                 mail.subject = text;
-//             }else{
-//                 QString subject = *iter;
-//                 subject = subject.split(":")[1];
-//                 subject = subject.trimmed();
-
-//                 mail.subject = subject;
-//             }
-//         }
-
-//         if((*iter).contains("From:")){
-//             QString text =*iter;
-
-//             if(text.contains("?B?")){
-//                 QRegularExpression regex(R"(<(\S+?)>)");
-//                 QString prev = regex.match(text).captured(1);
-//                 text = parseSubject(*iter,charset);
-//                 text = text + ": " + prev;
-//             }
-//             mail.from_email = text;
-//         }
-
-//         if((*iter).contains("To:")){
-//             QString text =*iter;
-//             if(text.contains("?B?")){
-//                 QRegularExpression regex(R"(<(\S+?)>)");
-//                 QString prev = regex.match(text).captured(1);
-//                 text = parseSubject(*iter,charset);
-//                 text = text + ": " + prev;
-//             }
-//             mail.to_email = text;
-//         }
-//     }
-
-//     if(msg.contains("Mails not exist!")){
-//         qWarning() << "请求的邮件不存在";
-//         return false;
-//     }
-
-//     QString nohtml;
-//     QString html;
-//     static const QRegularExpression re0(R"(Content-Transfer-Encoding: base64\s+(\s\S+?)\s+?------=_Part_)");
-//     QRegularExpressionMatch ma0 = re0.match(msg);
-//     if (ma0.hasMatch()) {
-//         nohtml = ma0.captured(1);
-//     }
-
-//     static const QRegularExpression re1(R"(Content-Type: text/html; \S+?\s+?Content-Transfer-Encoding: base64\s+(\S+\s*?\S+?)\s+?------=_Part_)");
-//     QRegularExpressionMatch ma1 = re1.match(msg);
-//     if (ma1.hasMatch()) {
-//         html = ma1.captured(1);
-//     }
-
-//     nohtml = gbkBase64ToUtf8(nohtml,charset);
-//     nohtml = nohtml.trimmed();
-//     mail.noHtmlText = nohtml;
-//     html = gbkBase64ToUtf8(html,charset);
-//     html = html.trimmed();
-//     mail.text = html;
-
-//     // 打印检查
-//     qDebug() << "第 " << num << " 封邮件发送自 " << mail.from_email << " ，主题是 " << mail.subject << " 正文是：" << mail.text;
-//     qDebug() << "nohtml: " << mail.noHtmlText;
-
-//     return true;
-// }
+            // 处理服务器返回数据
+            if (!msg.contains("a1 OK FETCH")) {
+                qWarning() << "服务器返回消息有问题";
+                return false;
+            }
+            // 提取关键信息
+            int index[3];
+            index[0] = msg.indexOf("From: ");
+            index[1] = msg.indexOf("Subject: ");
+            index[2] = msg.indexOf("Date: ");
+            std::sort(index, index+3);
+            extractMailInfos(msg.mid(index[0], index[1]-index[0]), mail);
+            extractMailInfos(msg.mid(index[1], index[2]-index[1]), mail);
+            extractMailInfos(msg.mid(index[2], msg.indexOf("\r\n\r\n")-index[2]+2), mail);
+            mail.to = this->id;
+            mail.messageId = i;
+            qDebug() << "第 " << id << " 封邮件在 " << mail.date << " 发送自 " << mail.from << " ，主题是 " << mail.subject;
+            mails.append(mail);
+        }
+    }
+    return true;
+}
 
 void NewSocket::connectToServer()
 {
@@ -579,6 +408,19 @@ bool NewSocket::tryConnection(QString server, int num)
         }
     } else {
         qWarning() << "newsocket: server 名称不可用";
+        return false;
+    }
+    return true;
+}
+
+bool NewSocket::disConnect(QString server)
+{
+    if (server == "stmp.qq.com") {
+        tcpSocket->disconnect();
+    } else if (server == "imap.qq.com") {
+        sslSocket->disconnect();
+    } else {
+        qWarning() << "服务器名称无法识别";
         return false;
     }
     return true;

@@ -31,16 +31,11 @@ private:
 
     // 标志
     bool flag = true;
-    //bool authFlag = false;
-    //bool loginFlag = false;
-    //bool connectFlag = false;
 
     QString id = "";
     QString code = "";
 
-    //QString strBoxName;
     QRegularExpressionMatch match;
-    //QString parseAddress(const QString &address);
     QString parseSubject(QString mimeStr,QString charset);
     QString gbkBase64ToUtf8(QString base64,QString charset);
     bool extractMailInfos(QString line, EmailInfo& info);
@@ -63,50 +58,37 @@ public:
     //     return debug;
     // }
 
-    //NewSocket();
     NewSocket(QObject *parent = nullptr);
     ~NewSocket();
 
     bool tryConnection(QString server, int num = 5);
+    bool disConnect(QString server);
     void sendCommand(QString command, QString serverName);
     bool login(QString id, QString code);
-    //bool readResponse();
     bool sendEmail(const QString& from, const QString& to,
                    const QString& subject, const QString& body);
     bool writeLetter(const QString &from, const QString &to, const QString &subject, const QString &body);
 
     QStringList getBoxNames();
-
-    // 收取历史邮件  多个重载函数
-    //bool getHisLetters();
-
     QString getId();
     QString getCode();
     QTcpSocket* getTcpSocket();
     QSslSocket* getSslSocket();
     bool socketState(QString socketName);
-    //void printVar();
     void connections();
-    //QString matchBoxName(QString origin);
-    //QVector<EmailInfo> getMails(QString box);
-    //bool reciviveByEmailId(int num, Mail& mail, QString boxName);
-    bool getMailofBox(EmailInfo &mail, QString boxName, int id = -1);
+    bool getMailOfBox(EmailInfo &mail, QString boxName, int id);
+    bool getMailsOfBox(QVector<EmailInfo> &mails, QString boxName);
 
 private slots:
     void connectToServer();
     void disconnectFromServer();
     void getMessage();
     void onErrorConnection();
-    //void onConnected();
-    //void onAuth();
     void onEncrypted();
     void onSslErrors(const QList<QSslError>& msgs);
-    //void onBoxNames(QString names);
 
 signals:
-    //void authSucc();
-    //void gotBoxNames(QString names);
-    //void transferBoxNames(QStringList names);
+
 };
 
 #endif // NEWSOCKET_H

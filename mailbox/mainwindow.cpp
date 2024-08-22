@@ -221,24 +221,19 @@ void MainWindow::on_actPullMails_triggered()
     for (const QString &name: names) {
         childItem = new QTreeWidgetItem(rootItem);
         childItem->setText(0, name);
-
-        // 遍历每个 BOX 收取邮件
-        // if (name == "收件箱") {
-        //     //curNewSocket->getMails(name);
-
-        // }
-
     }
     //ui->treeWidget->update();
     ui->treeWidget->expandAll();
 
-    NewSocket::EmailInfo mail;
-    for (int i = 1; i <= 14; i++) {
-        if (!curNewSocket->getMailofBox(i, mail, "收件箱")) {
-            qWarning() << "获取邮件失败";
-        }
-    }
+    // NewSocket::EmailInfo mail;
+    // for (int i = 1; i <= 14; i++) {
+    //     if (!curNewSocket->getMailOfBox(mail, "收件箱", i)) {
+    //         qWarning() << "获取邮件失败";
+    //     }
+    // }
+    QVector<NewSocket::EmailInfo> mails;
+    curNewSocket->getMailsOfBox(mails, "收件箱");
 
-
+    curNewSocket->disConnect("imap.qq.com");
 }
 
