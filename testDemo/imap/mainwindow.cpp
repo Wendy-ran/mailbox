@@ -25,6 +25,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btn_send_clicked()
 {
+    socket->abort();
+    socket->connectToHostEncrypted("imap.qq.com", 993);
+    QString str = "A1 LOGIN 3445003795@qq.com lddvdbkivnapchcb\r\n";
+    socket->write(str.toUtf8());
+    str = "2 SELECT INBOX\r\n";
+    socket->write(str.toUtf8());
+    ui->msgs->append("===========================");
+
     QString plainText = ui->sender->toPlainText();
     plainText.replace("\n", "\r\n").append("\r\n");
     //QByteArray message = QByteArray().append(plainText);
@@ -61,12 +69,14 @@ void MainWindow::getMessage()
         //flag = false;
     }
 
-    QStringList lines = message.split("\r\n", Qt::SkipEmptyParts);
+    QStringList lines = message.split("\r\n\r\n", Qt::SkipEmptyParts);
 
     for (const QString line : lines) {
         qDebug() << "-- 服务器：" << line;
         ui->msgs->append("服务器：" + line);
     }
+
+    //ui->msgs->append("服务器：" + message);
 }
 
 void MainWindow::onErrorConnection()

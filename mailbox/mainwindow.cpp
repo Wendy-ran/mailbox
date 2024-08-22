@@ -5,10 +5,6 @@
 #include    <QFileDialog>
 #include    <QCloseEvent>
 #include    "tformdoc.h"
-//#include "tdialoglogin.h"
-//#include <vmime/vmime.hpp>
-//#include <vmime/platforms/posix/posixHandler.hpp>
-//#include <iostream>
 
 void MainWindow::connections()
 {
@@ -214,39 +210,35 @@ void MainWindow::on_actPullMails_triggered()
     }
 
     QTreeWidgetItem* childItem, *rootItem = treeRootItems.value(curNewSocket->getId());
+    // 清除所有子节点
+    if (rootItem != nullptr) {
+        while (rootItem->childCount() > 0) {
+            QTreeWidgetItem* child = rootItem->child(0); // 获取第一个子节点
+            rootItem->removeChild(child); // 从 rootItem 中移除该子节点
+            delete child; // 删除子节点，释放内存
+        }
+    }
     for (const QString &name: names) {
         childItem = new QTreeWidgetItem(rootItem);
         childItem->setText(0, name);
+
+        // 遍历每个 BOX 收取邮件
+        // if (name == "收件箱") {
+        //     //curNewSocket->getMails(name);
+
+        // }
+
     }
-    ui->treeWidget->update();
+    //ui->treeWidget->update();
     ui->treeWidget->expandAll();
+
+    NewSocket::EmailInfo mail;
+    for (int i = 1; i <= 14; i++) {
+        if (!curNewSocket->getMailofBox(i, mail, "收件箱")) {
+            qWarning() << "获取邮件失败";
+        }
+    }
+
+
 }
-
-// void MainWindow::onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous)
-// {
-//     // QString box = current->text(0);
-
-//     // if (box == "收件箱") {
-
-//     // } else if (box == "已发送") {
-
-//     // } else if (box == "草稿箱") {
-
-//     // } else if (box == "垃圾箱") {
-
-//     // } else if (box == "垃圾邮件") {
-
-//     // }
-// }
-
-// void MainWindow::onTransferBoxNames(QStringList names)
-// {
-//     QTreeWidgetItem* childItem, *rootItem = treeRootItems.value(curNewSocket->getId());
-//     for (const QString &name: names) {
-//         childItem = new QTreeWidgetItem(rootItem);
-//         childItem->setText(0, name);
-//     }
-//     ui->treeWidget->update();
-//     ui->treeWidget->expandAll();
-// }
 

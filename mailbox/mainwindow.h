@@ -7,6 +7,7 @@
 #include "newsocket.h"
 #include <QTreeWidgetItem>
 #include <QMap>
+//#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {class MainWindow;}
