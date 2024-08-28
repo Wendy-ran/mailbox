@@ -10,10 +10,16 @@
 #include <QString>
 #include <QRandomGenerator>
 #include <QDateTime>
+#include <QTextEdit>
 
 QString TFormDoc::getCurrentFormattedTime(const QString& format) {
     QDateTime currentTime = QDateTime::currentDateTime();  // 获取当前日期和时间
     return currentTime.toString(format);  // 格式化并返回日期和时间
+}
+
+void TFormDoc::setText(QString text)
+{
+    ui->textEdit->append(text);
 }
 
 QString TFormDoc::generateRandomNumberString(int length) {
@@ -38,8 +44,10 @@ TFormDoc::TFormDoc(NewSocket* newSocket, QWidget *parent) :
 
     this->setWindowTitle("New Doc[*]");    //窗口标题
     this->setAttribute(Qt::WA_DeleteOnClose);   //关闭时自动删除
-    connect(ui->plainTextEdit, &QPlainTextEdit::modificationChanged,
-            this, &QWidget::setWindowModified);
+    // connect(ui->plainTextEdit, &QPlainTextEdit::modificationChanged,
+    //         this, &QWidget::setWindowModified);
+    // TODO: connect(ui->textEdit, &QTextEdit::textChanged,
+    //         this, &QWidget::setWindowModified);
 
     ui->comboSender->addItem(curNewSocket->getId());
 }
@@ -56,8 +64,8 @@ void TFormDoc::loadFromFile(QString &aFileName)
     if (aFile.open(QIODevice::ReadOnly | QIODevice::Text)) //以只读文本方式打开文件
     {
         QTextStream aStream(&aFile);    //用文本流读取文件
-        ui->plainTextEdit->clear();
-        ui->plainTextEdit->setPlainText(aStream.readAll()); //读取文本文件
+        ui->textEdit->clear();
+        ui->textEdit->setPlainText(aStream.readAll()); //读取文本文件
         aFile.close();
 
         m_filename=aFileName;             //保存当前文件名
@@ -87,33 +95,33 @@ void TFormDoc::saveToFile()
 void TFormDoc::setEditFont()
 {
     QFont   font;
-    font=ui->plainTextEdit->font();
+    font=ui->textEdit->font();
 
     bool    ok;
     font=QFontDialog::getFont(&ok,font);
-    ui->plainTextEdit->setFont(font);
+    ui->textEdit->setFont(font);
 }
 
 void TFormDoc::textCut()
 {
-    ui->plainTextEdit->cut();
+    ui->textEdit->cut();
 }
 
 void TFormDoc::textCopy()
 {
-    ui->plainTextEdit->copy();
+    ui->textEdit->copy();
 }
 
 void TFormDoc::textPaste()
 {
-    ui->plainTextEdit->paste();
+    ui->textEdit->paste();
 }
 
 void TFormDoc::on_btnSend_clicked()
 {
     //TODO 检查表单的数据是否合法
     bool isOk = curNewSocket->sendEmail(curNewSocket->getId(), ui->lineEditReceiver->text(),
-                            ui->lineEditTheme->text(), ui->plainTextEdit->toPlainText());
+                            ui->lineEditTheme->text(), ui->textEdit->toPlainText());
     if (isOk) {
         qDebug() << "邮件成功发送";
     } else {
@@ -148,8 +156,8 @@ void TFormDoc::createDirectoryAndFile(const QString &path, const QString &dirNam
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
         //out << "Hello, world!";  // 写入一些文本
-        out << this->ui->plainTextEdit->toPlainText();
-        qDebug() << this->ui->plainTextEdit->toPlainText();
+        out << this->ui->textEdit->toPlainText();
+        qDebug() << this->ui->textEdit->toPlainText();
         qDebug() << "File written successfully.";
         file.close();
     } else {

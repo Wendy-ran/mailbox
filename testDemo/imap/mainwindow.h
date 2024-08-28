@@ -18,6 +18,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void appendMessageWithColor(const QString &message, const QString &color);
+
 private slots:
     void on_btn_send_clicked();
 

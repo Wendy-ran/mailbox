@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnectFromServer()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(getMessage()));
     connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(onErrorConnection()));
-
 }
 
 MainWindow::~MainWindow()
@@ -25,13 +24,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btn_send_clicked()
 {
-    socket->abort();
-    socket->connectToHostEncrypted("imap.qq.com", 993);
-    QString str = "A1 LOGIN 3445003795@qq.com lddvdbkivnapchcb\r\n";
-    socket->write(str.toUtf8());
-    str = "2 SELECT INBOX\r\n";
-    socket->write(str.toUtf8());
-    ui->msgs->append("===========================");
+    // socket->abort();
+    // socket->connectToHostEncrypted("imap.qq.com", 993);
+    // QString str = "A1 LOGIN 3445003795@qq.com lddvdbkivnapchcb\r\n";
+    // socket->write(str.toUtf8());
+    // str = "2 SELECT INBOX\r\n";
+    // socket->write(str.toUtf8());
+    // ui->msgs->append("===========================");
 
     QString plainText = ui->sender->toPlainText();
     plainText.replace("\n", "\r\n").append("\r\n");
@@ -47,7 +46,14 @@ void MainWindow::on_btn_send_clicked()
 
 void MainWindow::on_btn_connect_clicked()
 {
+    socket->abort();
     socket->connectToHostEncrypted("imap.qq.com", 993);
+
+    //-------------
+    QString str = "A1 LOGIN 3445003795@qq.com lddvdbkivnapchcb\r\n";
+    socket->write(str.toUtf8());
+    str = "2 SELECT INBOX\r\n";
+    socket->write(str.toUtf8());
 }
 
 void MainWindow::connectToServer()
@@ -64,17 +70,19 @@ void MainWindow::disconnectFromServer()
 void MainWindow::getMessage()
 {
     QString message = socket->readAll();
-    if (!message.startsWith("2") && !message.startsWith("3")) {
-        qWarning() << "something is wrong: ";
-        //flag = false;
-    }
+    appendMessageWithColor("-- 服务器：" + message, "red");
 
-    QStringList lines = message.split("\r\n\r\n", Qt::SkipEmptyParts);
+    // if (!message.startsWith("2") && !message.startsWith("3")) {
+    //     qWarning() << "something is wrong: ";
+    //     //flag = false;
+    // }
 
-    for (const QString line : lines) {
-        qDebug() << "-- 服务器：" << line;
-        ui->msgs->append("服务器：" + line);
-    }
+    //QStringList lines = message.split("\r\n\r\n", Qt::SkipEmptyParts);
+
+    // for (const QString &line : lines) {
+    //     qDebug() << "-- 服务器：" << line;
+    //     ui->msgs->append("服务器：" + line);
+    // }
 
     //ui->msgs->append("服务器：" + message);
 }
@@ -83,4 +91,9 @@ void MainWindow::onErrorConnection()
 {
     qWarning() << "连接错误：" << socket->errorString();
     //this->reject();
+}
+
+void MainWindow::appendMessageWithColor(const QString &message, const QString &color) {
+    QString coloredMessage = QString("<span style='color: %1;'>%2</span>").arg(color).arg(message);
+    ui->msgs->append(coloredMessage);
 }

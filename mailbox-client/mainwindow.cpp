@@ -3,7 +3,6 @@
 
 #include    <QFileDialog>
 #include    <QCloseEvent>
-#include    "tformdoc.h"
 #include <QTimer>
 
 void MainWindow::connections()
@@ -112,6 +111,7 @@ void MainWindow::on_actDoc_Open_triggered()
 void MainWindow::on_actDoc_New_triggered()
 { //新建文件
     TFormDoc *formDoc = new TFormDoc(curNewSocket, this);
+    forms.append(formDoc);
     ui->mdiArea->addSubWindow(formDoc);     //文档窗口添加到MDI
     formDoc->show();    //在单独的窗口中显示
 
@@ -258,7 +258,6 @@ void MainWindow::on_actPullMails_triggered()
         "} "
         );
 
-
     labStatus->setText("拉取邮件完毕");
 }
 
@@ -308,3 +307,16 @@ void MainWindow::addItem(QString date, QString subject, QString from) {
     // 将自定义 widget 设置到列表项
     ui->listWidget->setItemWidget(item, widget);
 }
+
+void MainWindow::on_listWidget_itemActivated(QListWidgetItem *item)
+{
+    on_actDoc_New_triggered();
+    if (forms.empty()) {
+        qWarning() << "创建新小窗失败";
+        return;
+    }
+    TFormDoc *form = forms.last();
+    int row = ui->listWidget->row(item);
+    form->setText(curNewSocket->getMailDetail(row));
+}
+

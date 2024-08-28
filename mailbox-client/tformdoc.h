@@ -35,6 +35,8 @@ public:
     QString generateRandomNumberString(int length = 64);
     QString getCurrentFormattedTime(const QString& format = "yyyy-MM-dd-HHmmss");
 
+    void setText(QString text);
+
 private slots:
     void on_btnSend_clicked();
 

@@ -8,6 +8,8 @@
 #include <QTreeWidgetItem>
 #include <QMap>
 #include <QLabel>
+#include <QListWidgetItem>
+#include "tformdoc.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {class MainWindow;}
@@ -25,6 +27,7 @@ private:
     NewSocket* curNewSocket = nullptr;
     QLabel* labStatus;  // 状态信息
     //QDialog* popup;
+    QVector<TFormDoc*> forms;
 
     //枚举类型treeItemType， 用于创建 QTreeWidgetItem 时作为节点的type, 自定义类型必须大于1000
     //itTopItem 顶层节点;  itGroupItem 组节点； itImageItem 图片
@@ -79,6 +82,8 @@ private slots:
     void on_actPullMails_triggered();  // 收取邮件
 
     //void onTreeWidgetCurrentItem(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+
+    void on_listWidget_itemActivated(QListWidgetItem *item);
 
 public slots:
     //void onTransferBoxNames(QStringList names);

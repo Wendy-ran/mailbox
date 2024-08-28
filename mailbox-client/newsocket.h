@@ -68,6 +68,7 @@ public:
     bool sendEmail(const QString& from, const QString& to,
                    const QString& subject, const QString& body);
     bool writeLetter(const QString &from, const QString &to, const QString &subject, const QString &body);
+    QString getMailDetail(int id);
 
     QStringList getBoxNames();
     QString getId();

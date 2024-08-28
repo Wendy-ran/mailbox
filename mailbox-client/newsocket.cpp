@@ -314,6 +314,17 @@ bool NewSocket::writeLetter(const QString &from, const QString &to, const QStrin
     return flag;
 }
 
+QString NewSocket::getMailDetail(int id)
+{
+    sendCommand("a6 FETCH " + QString::number(id) + " BODY[TEXT]", "imap.qq.com");
+    if (sslSocket->waitForReadyRead()) {
+        qDebug() << "省略这段邮件正文...";
+        return sslSocket->readAll();
+    }
+    qWarning() << "读取邮件正文失败";
+    return QString();
+}
+
 QStringList NewSocket::getBoxNames()
 {
     //QStringList list;
