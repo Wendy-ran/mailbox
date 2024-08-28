@@ -3,6 +3,7 @@ build/
 
 # 忽略编译生成的可执行文件
 *.pro.user
+conf.json
 
 # 不忽略根目录下的 important.log 文件
 #!/important.log

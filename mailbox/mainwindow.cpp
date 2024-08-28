@@ -1,10 +1,10 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//#include    <QPainter>
 #include    <QFileDialog>
 #include    <QCloseEvent>
 #include    "tformdoc.h"
+#include <QTimer>
 
 void MainWindow::connections()
 {
@@ -54,13 +54,18 @@ MainWindow::MainWindow(NewSocket *newSocket, QWidget *parent) :
 //    this->setAutoFillBackground(true);
 
     id = curNewSocket->getId();
-    //id = "3445003795";
-    //code = "lddvdbkivnapchcb";
 
     // 初始化 QTreeWidget
     iniTree();
 
     connections();
+
+    labStatus = new QLabel(this);
+    labStatus->setMidLineWidth(200);
+    ui->statusBar->addWidget(labStatus);
+    //popup = new QDialog(this, Qt::Popup | Qt::FramelessWindowHint);
+
+    ui->treeWidget->setMaximumWidth(280);
 }
 
 MainWindow::~MainWindow()
@@ -198,7 +203,7 @@ void MainWindow::on_actNewAcc_triggered()
 
 void MainWindow::on_actPullMails_triggered()
 {
-    // on_actPullMails_triggered(); 手动调用这个槽函数
+    labStatus->setText("正在从远程服务器拉取邮件...");
 
     // 收取邮件需要连接 imap
     curNewSocket->tryConnection("imap.qq.com");
@@ -218,22 +223,77 @@ void MainWindow::on_actPullMails_triggered()
             delete child; // 删除子节点，释放内存
         }
     }
+
     for (const QString &name: names) {
         childItem = new QTreeWidgetItem(rootItem);
         childItem->setText(0, name);
+        //curNewSocket->getMailsOfBox(mails, name);
     }
     //ui->treeWidget->update();
     ui->treeWidget->expandAll();
 
-    // NewSocket::EmailInfo mail;
-    // for (int i = 1; i <= 14; i++) {
-    //     if (!curNewSocket->getMailOfBox(mail, "收件箱", i)) {
-    //         qWarning() << "获取邮件失败";
-    //     }
-    // }
     QVector<NewSocket::EmailInfo> mails;
-    curNewSocket->getMailsOfBox(mails, "收件箱");
+    curNewSocket->getMailsOfBox(mails, "收件箱");  // date subject from to messageId
+    curNewSocket->disConnect("imap.qq.com");  // 断开连接
 
-    curNewSocket->disConnect("imap.qq.com");
+    // 显示
+    ui->listWidget->clear();
+    for (NewSocket::EmailInfo mail: mails) {
+        addItem(mail.date, mail.subject, mail.from);
+    }
+    // 调整列表的整体样式，添加间隔线
+    ui->listWidget->setStyleSheet(
+        "QListWidget { background-color: white; border: none; }"
+        "QListWidget::item { border-bottom: 1px solid black; height: 70px; }"
+        );
+
+    labStatus->setText("拉取邮件完毕");
 }
 
+void MainWindow::addItem(QString date, QString subject, QString from) {
+    // 创建一个新的 QListWidgetItem
+    QListWidgetItem *item = new QListWidgetItem();
+    ui->listWidget->addItem(item);  // 添加项到 listWidget
+
+    // 创建自定义 widget 用于显示两行文本及图标
+    QWidget *widget = new QWidget;
+    QVBoxLayout *widgetLayout = new QVBoxLayout(widget);
+    widgetLayout->setSpacing(0);  // 设置布局内部的间距
+    widgetLayout->setContentsMargins(0, 0, 0, 0);  // 设置布局的边距
+
+    // 创建第一行的布局和内容，包括图标、标题和日期
+    QHBoxLayout *topLayout = new QHBoxLayout();
+    QLabel *topIcon = new QLabel;
+    topIcon->setPixmap(QPixmap("C:\\Users\\21863\\Pictures\\v2-d9f41bc31aa52513b1e8a7af6d9ecd16_1440w.jpg").scaled(16, 16));  // 设置图标
+    QLabel *labFrom = new QLabel(from);
+    QLabel *labDate = new QLabel(date);  // "2023-2-24"
+    labDate->setStyleSheet("color: gray; margin-left: 5px;");  // 为日期设置样式和间隔
+
+    topLayout->addWidget(topIcon);  // 添加图标到布局
+    topLayout->addSpacing(15);  // 增加图标与文本之间的横向间隔
+    topLayout->addWidget(labFrom);
+    topLayout->addStretch(1);  // 添加弹性空间
+    topLayout->addWidget(labDate);
+
+    // 创建第二行的布局和内容，只有描述文本，确保与第一行对齐
+    QHBoxLayout *bottomLayout = new QHBoxLayout();
+    QLabel *bottomIcon = new QLabel;
+    bottomIcon->setPixmap(QPixmap("C:\\Users\\21863\\Pictures\\v2-d9f41bc31aa52513b1e8a7af6d9ecd16_1440w.jpg").scaled(16, 16));  // 设置第二行的图标
+    QLabel *labSubj = new QLabel(subject);
+    //description->setStyleSheet("margin-left: 5px;");  // 设置文本的左边距，确保与上面标题对齐
+    QLabel *temp = new QLabel;
+
+    bottomLayout->addWidget(bottomIcon);  // 添加图标到布局
+    bottomLayout->addSpacing(15);
+    bottomLayout->addWidget(labSubj);
+    bottomLayout->addStretch(1);
+    bottomLayout->addWidget(temp);
+
+
+    // 将行布局添加到主 Widget
+    widgetLayout->addLayout(topLayout);
+    widgetLayout->addLayout(bottomLayout);
+
+    // 将自定义 widget 设置到列表项
+    ui->listWidget->setItemWidget(item, widget);
+}

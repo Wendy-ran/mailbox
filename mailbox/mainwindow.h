@@ -7,7 +7,7 @@
 #include "newsocket.h"
 #include <QTreeWidgetItem>
 #include <QMap>
-//#include <QLabel>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {class MainWindow;}
@@ -23,6 +23,8 @@ private:
     QString code;
     //QVector<NewSocket*> newSockets;
     NewSocket* curNewSocket = nullptr;
+    QLabel* labStatus;  // 状态信息
+    //QDialog* popup;
 
     //枚举类型treeItemType， 用于创建 QTreeWidgetItem 时作为节点的type, 自定义类型必须大于1000
     //itTopItem 顶层节点;  itGroupItem 组节点； itImageItem 图片
@@ -33,6 +35,8 @@ private:
     QMap<QString, QTreeWidgetItem*> treeRootItems;
 
     void connections();
+
+    void addItem(QString date, QString subject, QString from);
 
 protected:
     void closeEvent(QCloseEvent *event); //主窗口关闭时关闭所有子窗口

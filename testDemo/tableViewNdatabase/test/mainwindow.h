@@ -33,6 +33,11 @@ public:
     void connection();
     QSslSocket *socket;
 
+    void tree1();
+    void tree2();
+    void tree3();
+    void list();
+
 private:
     Ui::MainWindow *ui;
 };
