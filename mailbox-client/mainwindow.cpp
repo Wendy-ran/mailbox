@@ -243,9 +243,21 @@ void MainWindow::on_actPullMails_triggered()
     }
     // 调整列表的整体样式，添加间隔线
     ui->listWidget->setStyleSheet(
-        "QListWidget { background-color: white; border: none; }"
-        "QListWidget::item { border-bottom: 1px solid black; height: 70px; }"
+        "QListWidget { "
+        "    background-color: white; "
+        "    border: none; "
+        "} "
+        "QListWidget::item { "
+        "    border-bottom: 1px solid #dcdcdc; "  // 浅灰色分割线
+        "    height: 70px; "
+        "    padding: 10px; "  // 增加内边距
+        "} "
+        "QListWidget::item:selected { "  // 选中项的样式
+        "    background-color: #f0f0f0; "  // 选中项背景色
+        "    color: black; "
+        "} "
         );
+
 
     labStatus->setText("拉取邮件完毕");
 }
@@ -288,7 +300,6 @@ void MainWindow::addItem(QString date, QString subject, QString from) {
     bottomLayout->addWidget(labSubj);
     bottomLayout->addStretch(1);
     bottomLayout->addWidget(temp);
-
 
     // 将行布局添加到主 Widget
     widgetLayout->addLayout(topLayout);

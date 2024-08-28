@@ -13,7 +13,7 @@ CONFIG += c++11
 # INCLUDEPATH += /usr/include
 # DEPENDPATH += /usr/include
 
-TARGET = mailbox
+TARGET = client
 
 SOURCES += \
     main.cpp \
