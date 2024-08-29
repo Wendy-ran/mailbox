@@ -17,7 +17,7 @@ This project is a simple implementation of an email server and client using C++ 
 - Visual Studio
 
 ## Contact Information
-For any issues or suggestions, feel free to contact: 3445003795@qq.com
+For any issues or suggestions, feel free to contact: lsr2001329@gmail.com
 
 ## Copyright Information
 This project is currently for the author's learning and testing purposes only, for academic and communication use, not for commercial use.
