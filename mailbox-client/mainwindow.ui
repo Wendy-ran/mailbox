@@ -75,10 +75,6 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actDoc_New">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/100.bmp</normaloff>:/images/images/100.bmp</iconset>
-   </property>
    <property name="text">
     <string>写邮件</string>
    </property>
@@ -90,10 +86,6 @@
    </property>
   </action>
   <action name="actQuit">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/132.bmp</normaloff>:/images/images/132.bmp</iconset>
-   </property>
    <property name="text">
     <string>退出</string>
    </property>
@@ -102,10 +94,6 @@
    </property>
   </action>
   <action name="actDoc_Open">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/122.bmp</normaloff>:/images/images/122.bmp</iconset>
-   </property>
    <property name="text">
     <string>打开本地文本文档</string>
    </property>
@@ -120,10 +108,6 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/506.bmp</normaloff>:/images/images/506.bmp</iconset>
-   </property>
    <property name="text">
     <string>字体设置</string>
    </property>
@@ -134,10 +118,6 @@
   <action name="actCut">
    <property name="enabled">
     <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/200.bmp</normaloff>:/images/images/200.bmp</iconset>
    </property>
    <property name="text">
     <string>剪切</string>
@@ -153,10 +133,6 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/202.bmp</normaloff>:/images/images/202.bmp</iconset>
-   </property>
    <property name="text">
     <string>复制</string>
    </property>
@@ -170,10 +146,6 @@
   <action name="actPaste">
    <property name="enabled">
     <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/204.bmp</normaloff>:/images/images/204.bmp</iconset>
    </property>
    <property name="text">
     <string>粘贴</string>
@@ -189,10 +161,6 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/230.bmp</normaloff>:/images/images/230.bmp</iconset>
-   </property>
    <property name="text">
     <string>MDI 模式</string>
    </property>
@@ -201,10 +169,6 @@
    </property>
   </action>
   <action name="actCascade">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/400.bmp</normaloff>:/images/images/400.bmp</iconset>
-   </property>
    <property name="text">
     <string>级联展开</string>
    </property>
@@ -213,10 +177,6 @@
    </property>
   </action>
   <action name="actTile">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/406.bmp</normaloff>:/images/images/406.bmp</iconset>
-   </property>
    <property name="text">
     <string>平铺展开</string>
    </property>
@@ -225,10 +185,6 @@
    </property>
   </action>
   <action name="actCloseALL">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/128.bmp</normaloff>:/images/images/128.bmp</iconset>
-   </property>
    <property name="text">
     <string>关闭全部窗口</string>
    </property>
@@ -247,10 +203,6 @@
   <action name="actDoc_Save">
    <property name="enabled">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/images/104.bmp</normaloff>:/images/images/104.bmp</iconset>
    </property>
    <property name="text">
     <string>保存</string>
@@ -272,9 +224,7 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>actQuit</sender>

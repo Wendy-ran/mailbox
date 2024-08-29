@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include    <QtNetwork>
 
+
 QString MainWindow::getLocalIP()
 {//获取本机IPv4地址
     QString hostName=QHostInfo::localHostName();    //本地主机名
