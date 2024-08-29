@@ -1,0 +1,30 @@
+name: Count Lines of Code
+
+on: [push, pull_request]
+
+jobs:
+  count:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Chocolatey
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force;
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+    - name: Install cloc
+      run: choco install cloc -y
+
+    - name: Count lines of code
+      run: cloc ${{ github.workspace }} --exclude-dir=node_modules --report-file=result.txt
+      shell: pwsh
+
+    - name: Upload result
+      uses: actions/upload-artifact@v2
+      with:
+        name: cloc-results
+        path: result.txt

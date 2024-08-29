@@ -43,8 +43,6 @@
 //         vmime::utility::url url("imaps://imap.qq.com:993");
 //         vmime::shared_ptr<vmime::net::store> store = sess->getStore(url);
 //         store->setProperty("options.need-authentication", true);
-//         store->setProperty("auth.username", "2186362422@qq.com");
-//         store->setProperty("auth.password", "lddvdbkivnapchcb");
 //         store->setProperty("connection.tls", true);  // 使用 TLS
 
 //         // 连接到邮箱服务器
