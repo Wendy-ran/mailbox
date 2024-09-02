@@ -5,8 +5,7 @@
 
 #include    <QTcpServer>
 #include    <QLabel>
-#include <QVector>
-#include <QTextEdit>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,31 +17,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    // 颜色
-    const QString hawthornRed = "rgb(49, 101, 95)";
-    const QString purple = "rgb(150, 56, 161)";
-
     QLabel  *labListen;         //状态栏标签
     QLabel  *labSocketState;    //状态栏标签
 
     QTcpServer *tcpServer;      //TCP服务器
     QTcpSocket *tcpSocket=nullptr;      //TCP通讯的Socket
     QString getLocalIP();       //获取本机IP地址
-
-    QVector<QTextEdit*> textEdits;
-    QTextEdit* curWriteEdit;
-
-    QString workDir;  // 工作目录
-
-    int loginStep = 0;
-
-    void connections();
-    void initUI();
-
-    void appendText(QTextEdit* textEdit, QString text, QString color = "black");
-    bool createSubfolder(const QString &workDir, const QString &subDir);
-    bool saveFlag = false;
-    bool createTextFile(const QString &dir, const QString &file, const QString &text);
 
 //protected:
 //    void    closeEvent(QCloseEvent *event);   //close事件处理函数
@@ -63,29 +43,11 @@ private slots:
 
     void on_actStop_triggered();
 
-    //void on_actClear_triggered();
+    void on_actClear_triggered();
 
     void on_btnSend_clicked();
 
     void on_actHostInfo_triggered();
-    void on_btnClear_clicked();
-
-    void on_btnNewP_clicked();
-
-    void on_btnPrevP_clicked();
-
-    void on_btnNextP_clicked();
-
-    void on_actChoseField_triggered();
-
-    void onStackNumChanged();
-    void onCurrentChanged(int index);
-
-    void on_btnSave_clicked();
-
-signals:
-    void stackNumChanged();
-
 private:
     Ui::MainWindow *ui;
 };

@@ -47,6 +47,8 @@ MainWindow::MainWindow(NewSocket *newSocket, QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->setWindowTitle("Client");
+
     //setCentralWidget(ui->mdiArea);
     setWindowState(Qt::WindowMaximized);  //窗口最大化显示
     ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
