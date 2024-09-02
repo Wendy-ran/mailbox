@@ -187,6 +187,8 @@ void MainWindow::do_socketStateChange(QAbstractSocket::SocketState socketState)
 
 void MainWindow::do_clientConnected()  // 客户端接入时
 {
+    ui->btnSend->setEnabled(true);
+
     //curWritePage->append("客户端连接成功！");
     appendText(curWriteEdit, "客户端连接成功！", purple);
     // curWritePage->append("客户端地址："+ tcpSocket->peerAddress().toString()
@@ -226,6 +228,25 @@ void MainWindow::do_socketReadyRead() // 读取缓冲区的行文本
         } else if (loginStep == 4 && str.trimmed() == "aaa") {  // id
             loginStep++;
             tcpSocket->write("235 Authentication successful");
+        } else if (loginStep == 5 && str.trimmed().left(9) == "MAIL FROM") {  // 来自
+            loginStep++;
+            tcpSocket->write("250 Ok");
+        } else if (loginStep == 6 && str.trimmed().left(9) == "RCPT TO") {  // 发给
+            loginStep++;
+            // TODO
+            tcpSocket->write("250 Ok");
+        } else if (loginStep == 7 && str.trimmed() == "DATA") {
+            loginStep++;
+            tcpSocket->write("354 End data with <CR><LF>.<CR><LF>");
+        } else if (loginStep == 8) {  // 解析正文
+            loginStep++;
+            // TODO
+            tcpSocket->write("250 Ok: queued as");
+        }
+
+        if (str.trimmed() == "QUIT") {
+            tcpSocket->write("221 Bye");
+            tcpSocket->disconnect();
         }
     }
 
@@ -275,14 +296,22 @@ void MainWindow::on_actStop_triggered()  // 停止监听
 void MainWindow::on_btnSend_clicked()  // "发送消息"按钮，发送一行字符串，以换行符结束
 {
     QString msg = ui->editMsg->text();
-    //curWriteEdit->append("[out] "+msg);
-    appendText(curWriteEdit, "[out] "+msg);
+    if (msg == "（导入文件内容为空）") {
+        return;
+    } else if (msg.right(3) == "...") {
+        appendText(curWriteEdit, "[out] " + commands);
+        QByteArray str = commands.toUtf8();
+        str.append('\n');       //添加一个换行符
+        tcpSocket->write(str);
+    } else {
+        appendText(curWriteEdit, "[out] " + msg);
+        QByteArray str = msg.toUtf8();
+        str.append('\n');       //添加一个换行符
+        tcpSocket->write(str);
+    }
+
     ui->editMsg->clear();
     ui->editMsg->setFocus();
-
-    QByteArray  str=msg.toUtf8();
-    str.append('\n');       //添加一个换行符
-    tcpSocket->write(str);
 }
 
 void MainWindow::on_actHostInfo_triggered()
@@ -455,4 +484,44 @@ bool MainWindow::createTextFile(const QString &dir, const QString &file, const Q
     return true;
 }
 
+void MainWindow::on_btnCmds_clicked()  // 导入命令
+{
+    // 打开文件选择对话框
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        tr("Open Text File"),
+        "",
+        tr("Text Files (*.txt)")
+        );
 
+    // 检查用户是否真的选择了文件
+    if (filePath.isEmpty()) {
+        qDebug() << "No file selected.";
+        return;
+    }
+
+    // 调用读取文件的函数
+    commands = readTextFile(filePath);
+    qDebug() << "File content:" << commands;
+
+    if (commands.isEmpty()) {
+        ui->editMsg->setText("（导入文件内容为空）");
+    } else {
+        ui->editMsg->setText(commands.left(35) + "...");
+    }
+}
+
+QString MainWindow::readTextFile(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Could not open the file for reading.";
+        return QString(); // 返回一个空的 QString
+    }
+
+    QTextStream stream(&file);
+    QString content = stream.readAll(); // 读取文件的所有内容
+    file.close(); // 关闭文件
+
+    return content; // 返回读取的内容
+}

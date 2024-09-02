@@ -43,6 +43,8 @@ private:
     bool createSubfolder(const QString &workDir, const QString &subDir);
     bool saveFlag = false;
     bool createTextFile(const QString &dir, const QString &file, const QString &text);
+    QString readTextFile(const QString &filePath);
+    QString commands;
 
 //protected:
 //    void    closeEvent(QCloseEvent *event);   //close事件处理函数
@@ -82,6 +84,8 @@ private slots:
     void onCurrentChanged(int index);
 
     void on_btnSave_clicked();
+
+    void on_btnCmds_clicked();
 
 signals:
     void stackNumChanged();
